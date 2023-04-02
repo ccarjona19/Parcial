@@ -1,0 +1,75 @@
+import argparse
+import sqlite3
+
+def registrar_articulo(nombre, descripcion, precio, cantidad, conexion):
+    cursor = conexion.cursor()
+    cursor.execute("INSERT INTO inventario(nombre, descripcion, precio, cantidad) VALUES (?, ?, ?, ?)",
+                   (nombre, descripcion, precio, cantidad))
+    conexion.commit()
+    print("Artículo registrado exitosamente")
+
+def buscar_articulo(nombre, conexion):
+    cursor = conexion.cursor()
+    cursor.execute("SELECT * FROM inventario WHERE nombre=?", (nombre,))
+    articulo = cursor.fetchone()
+    if articulo:
+        print(f"Nombre: {articulo[1]}")
+        print(f"Descripción: {articulo[2]}")
+        print(f"Precio: {articulo[3]}")
+        print(f"Cantidad: {articulo[4]}")
+    else:
+        print("No se encontró el artículo")
+
+def editar_articulo(nombre, campo, valor, conexion):
+    cursor = conexion.cursor()
+    cursor.execute(f"UPDATE inventario SET {campo}=? WHERE nombre=?", (valor, nombre))
+    conexion.commit()
+    print("Artículo actualizado exitosamente")
+
+def eliminar_articulo(nombre, conexion):
+    cursor = conexion.cursor()
+    cursor.execute("DELETE FROM inventario WHERE nombre=?", (nombre,))
+    conexion.commit()
+    print("Artículo eliminado exitosamente")
+
+def mostrar_menu():
+    print("Bienvenido al sistema de inventario")
+    print("1. Registrar un artículo")
+    print("2. Buscar un artículo")
+    print("3. Editar un artículo")
+    print("4. Eliminar un artículo")
+    print("5. Salir")
+
+def main():
+    conexion = sqlite3.connect("inventario.db")
+
+    while True:
+        mostrar_menu()
+        opcion = input("Ingrese una opción: ")
+
+        if opcion == "1":
+            nombre = input("Ingrese el nombre del artículo: ")
+            descripcion = input("Ingrese la descripción del artículo: ")
+            precio = input("Ingrese el precio del artículo: ")
+            cantidad = input("Ingrese la cantidad disponible del artículo: ")
+            registrar_articulo(nombre, descripcion, precio, cantidad, conexion)
+        elif opcion == "2":
+            nombre = input("Ingrese el nombre del artículo a buscar: ")
+            buscar_articulo(nombre, conexion)
+        elif opcion == "3":
+            nombre = input("Ingrese el nombre del artículo a editar: ")
+            campo = input("Ingrese el campo a editar (nombre, descripcion, precio o cantidad): ")
+            valor = input("Ingrese el nuevo valor del campo: ")
+            editar_articulo(nombre, campo, valor, conexion)
+        elif opcion == "4":
+            nombre = input("Ingrese el nombre del artículo a eliminar: ")
+            eliminar_articulo(nombre, conexion)
+        elif opcion == "5":
+            print("¡Hasta luego!")
+            break
+        else:
+            print("Opción no válida. Intente de nuevo.")
+
+
+if __name__ == '__main__':
+    main()
